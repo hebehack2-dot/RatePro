@@ -1,0 +1,5 @@
+{
+  "name": "FreelanceRatePro",
+  "description": "A professional SaaS-style calculator for freelancers to determine their ideal hourly rate based on expenses, profit goals, and taxes.",
+  "requestFramePermissions": []
+}
