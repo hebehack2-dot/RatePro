@@ -34,6 +34,9 @@
         .donut-segment {
             transition: stroke-dasharray 0.5s ease;
         }
+        .badge-fade {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
     </style>
     <script type="importmap">
     {
@@ -518,6 +521,38 @@
         };
 
         // --- UI Rendering ---
+        const updateDailyBadge = (val) => {
+            const badge = document.getElementById('billable-badge');
+            if (!badge) return;
+
+            if (!val || val <= 0) {
+                badge.style.opacity = '0';
+                badge.style.transform = 'translateY(-4px)';
+                return;
+            }
+
+            const perDay = val / 5;
+            const hrs = Math.floor(perDay);
+            const mins = Math.round((perDay - hrs) * 60);
+
+            let text = "";
+            if (val === 40) {
+                text = "Full-time (8 Hours / day)";
+            } else {
+                const parts = [];
+                if (hrs > 0) parts.push(`${hrs} hr${hrs > 1 ? 's' : ''}`);
+                if (mins > 0) parts.push(`${mins} min${mins > 1 ? 's' : ''}`);
+                text = `≈ ${parts.join(' ')} / day`;
+            }
+
+            badge.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>${text}</span>
+            `;
+            badge.style.opacity = '1';
+            badge.style.transform = 'translateY(0)';
+        };
+
         const renderCalculator = () => {
             const container = document.getElementById('calc-inputs');
             const inputsList = [
@@ -533,6 +568,8 @@
                 const isCurrency = !item.suffix;
                 const symbol = currencyConfig[state.inputs.currency].symbol;
                 const isAED = state.inputs.currency === 'AED';
+                const isBillable = item.id === 'billableHoursPerWeek';
+
                 return `
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-semibold text-slate-700">${item.label}</label>
@@ -543,6 +580,7 @@
                             ${isCurrency && isAED ? `<span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">DH</span>` : ''}
                         </div>
                         <p class="text-[11px] text-slate-500">${item.desc}</p>
+                        ${isBillable ? `<div id="billable-badge" class="badge-fade mt-2 flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-[10px] font-bold w-fit border border-blue-100 opacity-0 transform -translate-y-1"></div>` : ''}
                     </div>
                 `;
             }).join('');
@@ -554,9 +592,16 @@
                     let val = parseFloat(e.target.value) || 0;
                     if (id === 'weeksPerYear' && val > 52) val = 52;
                     state.inputs[id] = val;
+                    
+                    if (id === 'billableHoursPerWeek') {
+                        updateDailyBadge(val);
+                    }
                     updateResults();
                 });
             });
+
+            // Initial badge update
+            updateDailyBadge(state.inputs.billableHoursPerWeek);
         };
 
         const updateResults = () => {

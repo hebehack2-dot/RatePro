@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface InputProps {
@@ -9,9 +8,10 @@ interface InputProps {
   prefix?: string;
   suffix?: string;
   max?: number;
+  footer?: React.ReactNode;
 }
 
-export const Input: React.FC<InputProps> = ({ label, description, value, onChange, prefix, suffix, max }) => {
+export const Input: React.FC<InputProps> = ({ label, description, value, onChange, prefix, suffix, max, footer }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = parseFloat(e.target.value) || 0;
     if (max !== undefined && val > max) val = max;
@@ -41,6 +41,11 @@ export const Input: React.FC<InputProps> = ({ label, description, value, onChang
         )}
       </div>
       <p className="text-[11px] text-slate-500">{description}</p>
+      {footer && (
+        <div className="mt-1">
+          {footer}
+        </div>
+      )}
     </div>
   );
 };
