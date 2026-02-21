@@ -6,6 +6,9 @@
     <title>Freelance Rate Calculator | FreelanceRatePro - Find Your Ideal Hourly Rate</title>
     <meta name="description" content="Calculate your ideal freelance hourly rate based on expenses, profit goals, and taxes. Stop undercharging and start building a profitable freelance business.">
     
+    <!-- Puter.js SDK -->
+    <script src="https://js.puter.com/v2/"></script>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -37,6 +40,16 @@
         .badge-fade {
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
+        .ai-glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
     </style>
     <script type="importmap">
     {
@@ -50,6 +63,7 @@
     </script>
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3710786602891626" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="antialiased">
 
@@ -118,8 +132,9 @@
                 </div>
             </div>
 
-            <!-- Results Display -->
-            <div class="w-full lg:w-5/12 lg:sticky lg:top-24">
+            <!-- Results & AI Sidebar -->
+            <div class="w-full lg:w-5/12 lg:sticky lg:top-24 space-y-6">
+                <!-- Results Display -->
                 <div class="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden border border-slate-800">
                     <div class="absolute top-0 right-0 p-8 opacity-5">
                         <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
@@ -181,7 +196,47 @@
                     </div>
                 </div>
 
-                <div class="mt-6 bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-start gap-3">
+                <!-- AI Negotiation Assistant -->
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 ai-glow">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800">AI Negotiation Coach</h3>
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Powered by Puter.js</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Need help explaining your new <span class="font-bold text-indigo-600" id="ai-context-rate">$0.00</span> rate? Ask me to write an email or handle a negotiation.
+                        </p>
+                        
+                        <div class="relative">
+                            <textarea id="ai-input" rows="3" placeholder="e.g., How do I tell a client I'm raising my rates? or Write a professional invoice email." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"></textarea>
+                        </div>
+
+                        <button id="ai-ask-btn" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group shadow-lg shadow-slate-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span id="ai-btn-text">Ask AI Assistant</span>
+                            <svg id="ai-btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+                        </button>
+
+                        <!-- AI Response Container -->
+                        <div id="ai-response-container" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 relative">
+                                <button id="ai-copy-btn" class="absolute top-3 right-3 p-1.5 bg-white border border-indigo-200 rounded-lg text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm" title="Copy response">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                </button>
+                                <div id="ai-response-text" class="text-xs text-indigo-900 leading-relaxed whitespace-pre-wrap pr-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-start gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 mt-1 flex-shrink-0"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                     <p class="text-sm text-emerald-800 leading-relaxed">
                         <strong>Pro Tip:</strong> Most freelancers forget to account for "non-billable" time. We recommend setting your billable hours to no more than 25-30 per week.
@@ -607,9 +662,14 @@
         const updateResults = () => {
             const res = calculateResults();
             const { currency } = state.inputs;
-            document.getElementById('res-hourly').innerText = formatRate(res.requiredHourlyRate, currency);
+            const hourly = formatRate(res.requiredHourlyRate, currency);
+            document.getElementById('res-hourly').innerText = hourly;
             document.getElementById('res-daily').innerText = formatCurrency(res.requiredDailyRate, currency);
             document.getElementById('res-yearly').innerText = formatCurrency(res.yearlyGrossNeeded, currency);
+            
+            // Update AI Context Label
+            const contextLabel = document.getElementById('ai-context-rate');
+            if (contextLabel) contextLabel.innerText = hourly;
 
             // Update Chart
             const expenses = state.inputs.personalExpenses + state.inputs.businessExpenses;
@@ -618,9 +678,11 @@
             const total = expenses + profit + taxes;
 
             const updateSegment = (id, value, offset) => {
+                const element = document.getElementById(id);
+                if (!element) return offset;
                 const percent = total > 0 ? (value / total) * 100 : 0;
-                document.getElementById(id).setAttribute('stroke-dasharray', `${percent} ${100 - percent}`);
-                document.getElementById(id).setAttribute('stroke-dashoffset', 100 - offset);
+                element.setAttribute('stroke-dasharray', `${percent} ${100 - percent}`);
+                element.setAttribute('stroke-dashoffset', 100 - offset);
                 return offset + percent;
             };
 
@@ -630,20 +692,81 @@
             offset = updateSegment('segment-taxes', taxes, offset);
         };
 
+        // --- AI Assistant Logic ---
+        const initAI = () => {
+            const askBtn = document.getElementById('ai-ask-btn');
+            const btnText = document.getElementById('ai-btn-text');
+            const btnIcon = document.getElementById('ai-btn-icon');
+            const input = document.getElementById('ai-input');
+            const responseContainer = document.getElementById('ai-response-container');
+            const responseText = document.getElementById('ai-response-text');
+            const copyBtn = document.getElementById('ai-copy-btn');
+
+            if (!askBtn) return;
+
+            askBtn.addEventListener('click', async () => {
+                const userQuery = input.value.trim();
+                if (!userQuery) return;
+
+                // Loading State
+                askBtn.disabled = true;
+                const originalText = btnText.innerText;
+                btnText.innerText = "AI is thinking...";
+                btnIcon.classList.add('animate-pulse-soft');
+                responseContainer.classList.add('hidden');
+
+                const res = calculateResults();
+                const currentRate = formatRate(res.requiredHourlyRate, state.inputs.currency);
+                
+                // System Prompt defined by requirements
+                const systemPrompt = `You are a professional freelance coach. The user's calculated hourly rate is ${currentRate}. Help them negotiate or write professional emails based on this.`;
+
+                try {
+                    // Correct Puter.js v2 syntax: puter.ai.chat(prompt, options)
+                    const fullPrompt = `${systemPrompt}\n\nUser Question: ${userQuery}`;
+                    const response = await puter.ai.chat(fullPrompt, { model: 'gpt-4o' });
+                    
+                    if (!response) throw new Error("Empty response from Puter AI");
+
+                    responseText.innerText = response.toString();
+                    responseContainer.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Puter AI Error:", error);
+                    alert("Error: Puter.js failed to communicate with the AI. Check console for details.");
+                    responseText.innerText = "Error: Failed to get AI response. Please try again or check if you are connected to Puter.js.";
+                    responseContainer.classList.remove('hidden');
+                } finally {
+                    askBtn.disabled = false;
+                    btnText.innerText = originalText;
+                    btnIcon.classList.remove('animate-pulse-soft');
+                }
+            });
+
+            copyBtn.addEventListener('click', () => {
+                const text = responseText.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalSvg = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>';
+                    setTimeout(() => copyBtn.innerHTML = originalSvg, 2000);
+                });
+            });
+        };
+
         // --- Converter Logic ---
         const fetchRates = async () => {
             const refreshIcon = document.getElementById('conv-refresh-icon');
-            refreshIcon.classList.add('animate-spin');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
             try {
                 const response = await fetch(`https://open.er-api.com/v6/latest/${state.converter.from}`);
                 const data = await response.json();
                 state.converter.rates = data.rates;
-                document.getElementById('last-updated-text').innerText = `• Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                const updatedLabel = document.getElementById('last-updated-text');
+                if (updatedLabel) updatedLabel.innerText = `• Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                 updateConverterResult();
             } catch (err) {
-                console.error("Fetch failed", err);
+                console.error("Fetch rates failed", err);
             } finally {
-                refreshIcon.classList.remove('animate-spin');
+                if (refreshIcon) refreshIcon.classList.remove('animate-spin');
             }
         };
 
@@ -651,15 +774,23 @@
             const amount = state.converter.amount;
             const rate = state.converter.rates[state.converter.to] || 0;
             const result = amount * rate;
-            document.getElementById('conv-result').innerText = formatCurrency(result, state.converter.to);
-            document.getElementById('conv-to-label').innerText = state.converter.to;
-            document.getElementById('conv-from-symbol').innerText = currencyConfig[state.converter.from]?.symbol || '$';
+            const resultLabel = document.getElementById('conv-result');
+            const toLabel = document.getElementById('conv-to-label');
+            const fromSymbol = document.getElementById('conv-from-symbol');
+
+            if (resultLabel) resultLabel.innerText = formatCurrency(result, state.converter.to);
+            if (toLabel) toLabel.innerText = state.converter.to;
+            if (fromSymbol) fromSymbol.innerText = currencyConfig[state.converter.from]?.symbol || '$';
         };
 
         const initConverter = () => {
             const fromSelect = document.getElementById('conv-from');
             const toSelect = document.getElementById('conv-to');
             const amountInput = document.getElementById('conv-amount');
+            const swapBtn = document.getElementById('conv-swap');
+            const applyBtn = document.getElementById('apply-conv-btn');
+
+            if (!fromSelect || !toSelect || !amountInput) return;
 
             const options = topCurrencies.map(c => `<option value="${c}">${c}</option>`).join('');
             fromSelect.innerHTML = options;
@@ -681,34 +812,40 @@
                 updateConverterResult();
             });
 
-            document.getElementById('conv-swap').addEventListener('click', () => {
-                const temp = state.converter.from;
-                state.converter.from = state.converter.to;
-                state.converter.to = temp;
-                fromSelect.value = state.converter.from;
-                toSelect.value = state.converter.to;
-                fetchRates();
-            });
+            if (swapBtn) {
+                swapBtn.addEventListener('click', () => {
+                    const temp = state.converter.from;
+                    state.converter.from = state.converter.to;
+                    state.converter.to = temp;
+                    fromSelect.value = state.converter.from;
+                    toSelect.value = state.converter.to;
+                    fetchRates();
+                });
+            }
 
-            document.getElementById('apply-conv-btn').addEventListener('click', (e) => {
-                const rate = state.converter.rates[state.converter.to] || 0;
-                const converted = Math.round(state.converter.amount * rate);
-                state.inputs.desiredProfit = converted;
-                
-                renderCalculator();
-                updateResults();
-                
-                e.target.innerText = 'Applied!';
-                e.target.classList.remove('bg-blue-600');
-                e.target.classList.add('bg-emerald-500');
-                setTimeout(() => {
-                    e.target.innerHTML = 'Use this amount in Calculator <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>';
-                    e.target.classList.remove('bg-emerald-500');
-                    e.target.classList.add('bg-blue-600');
-                }, 2000);
+            if (applyBtn) {
+                applyBtn.addEventListener('click', (e) => {
+                    const rate = state.converter.rates[state.converter.to] || 0;
+                    const converted = Math.round(state.converter.amount * rate);
+                    state.inputs.desiredProfit = converted;
+                    
+                    renderCalculator();
+                    updateResults();
+                    
+                    const originalHTML = applyBtn.innerHTML;
+                    applyBtn.innerText = 'Applied!';
+                    applyBtn.classList.remove('bg-blue-600');
+                    applyBtn.classList.add('bg-emerald-500');
+                    setTimeout(() => {
+                        applyBtn.innerHTML = originalHTML;
+                        applyBtn.classList.remove('bg-emerald-500');
+                        applyBtn.classList.add('bg-blue-600');
+                    }, 2000);
 
-                document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
-            });
+                    const calcElement = document.getElementById('calculator');
+                    if (calcElement) calcElement.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
 
             fetchRates();
         };
@@ -719,11 +856,14 @@
             const title = document.getElementById('modal-title');
             const body = document.getElementById('modal-body');
             
+            if (!modal || !title || !body) return;
+
             if (type === 'privacy') {
                 title.innerText = 'Privacy Policy';
                 body.innerHTML = `
                     <div class="space-y-4 text-slate-600 text-sm">
                         <p><strong>Data Collection:</strong> We do not store your financial data. All calculations are performed locally in your browser.</p>
+                        <p><strong>AI Features:</strong> Our AI negotiation assistant is powered by Puter.js. Data shared in the AI text area is processed by their models to provide responses.</p>
                         <p><strong>Cookies:</strong> We use basic cookies to analyze website traffic and improve user experience.</p>
                         <p><strong>Third-Party Links:</strong> Our Resources section contains affiliate links where we may earn a commission at no extra cost to you.</p>
                     </div>
@@ -734,6 +874,7 @@
                     <div class="space-y-4 text-slate-600 text-sm">
                         <p>This tool is for estimation purposes only. Please consult with a financial professional for official tax and business advice.</p>
                         <p>FreelanceRatePro is not liable for any financial decisions made based on these estimations.</p>
+                        <p>The AI Negotiation Coach is an assistant tool and its suggestions should be reviewed carefully before use with clients.</p>
                     </div>
                 `;
             }
@@ -744,37 +885,49 @@
 
         const closeModal = () => {
             const modal = document.getElementById('legal-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
             document.body.classList.remove('modal-active');
         };
 
-        document.getElementById('currency-select').addEventListener('change', (e) => {
-            state.inputs.currency = e.target.value;
-            renderCalculator();
-            updateResults();
-        });
+        const currencySelect = document.getElementById('currency-select');
+        if (currencySelect) {
+            currencySelect.addEventListener('change', (e) => {
+                state.inputs.currency = e.target.value;
+                renderCalculator();
+                updateResults();
+            });
+        }
 
-        document.getElementById('share-btn').addEventListener('click', async () => {
-            const res = calculateResults();
-            const text = `Hourly Rate: ${formatRate(res.requiredHourlyRate, state.inputs.currency)}/hr\nCheck yours at FreelanceRatePro.com`;
-            try {
-                if (navigator.share) {
-                    await navigator.share({ title: 'My Rates', text, url: location.href });
-                } else {
-                    await navigator.clipboard.writeText(text);
-                    const btn = document.getElementById('share-btn');
-                    btn.innerText = 'Copied!';
-                    setTimeout(() => btn.innerHTML = '<svg id="share-icon" ...> Share', 2000);
-                }
-            } catch (err) {}
-        });
+        const shareBtn = document.getElementById('share-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                const res = calculateResults();
+                const text = `Hourly Rate: ${formatRate(res.requiredHourlyRate, state.inputs.currency)}/hr\nCheck yours at FreelanceRatePro.com`;
+                try {
+                    if (navigator.share) {
+                        await navigator.share({ title: 'My Rates', text, url: location.href });
+                    } else {
+                        await navigator.clipboard.writeText(text);
+                        const originalHTML = shareBtn.innerHTML;
+                        shareBtn.innerText = 'Copied!';
+                        setTimeout(() => shareBtn.innerHTML = originalHTML, 2000);
+                    }
+                } catch (err) {}
+            });
+        }
 
         // Initialize App
-        renderCalculator();
-        updateResults();
-        initConverter();
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalculator();
+            updateResults();
+            initConverter();
+            initAI();
+        });
 
     </script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
