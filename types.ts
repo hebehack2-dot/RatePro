@@ -1,5 +1,6 @@
 
 export type CurrencyCode = 'USD' | 'INR' | 'EUR' | 'GBP' | 'AED';
+export type ViewMode = 'calculator' | 'thumbnail';
 
 export interface Currency {
   code: CurrencyCode;

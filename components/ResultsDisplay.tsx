@@ -76,7 +76,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, inputs 
   };
 
   return (
-    <div className="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl shadow-blue-900/10 overflow-hidden relative border border-slate-800">
+    <div className="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-6 md:p-8 shadow-xl shadow-blue-900/10 dark:shadow-none overflow-hidden relative border border-slate-800 dark:border-slate-700">
       <div className="absolute top-0 right-0 p-8 opacity-5">
         <TrendingUp size={120} />
       </div>
