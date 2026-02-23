@@ -13,8 +13,9 @@ import { LegalModal } from './components/LegalModal';
 import { CurrencyConverter } from './components/CurrencyConverter';
 import { AINegotiationCoach } from './components/AINegotiationCoach';
 import { ThumbnailStudio } from './components/ThumbnailStudio';
+import { AdminModal } from './components/AdminModal';
 import { CalculatorInputs, CalculationResults, CurrencyCode, ViewMode } from './types';
-import { Calculator as CalcIcon, Info, Sparkles, Globe, Image as ImageIcon } from 'lucide-react';
+import { Calculator as CalcIcon, Info, Sparkles, Globe, Image as ImageIcon, Clock } from 'lucide-react';
 
 const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -36,6 +37,54 @@ const App: React.FC = () => {
   }, [isDarkMode]);
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+
+  const [user, setUser] = useState<any>(null);
+  const [isPro, setIsPro] = useState(false);
+  const [proExpiry, setProExpiry] = useState<Date | null>(null);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (window.puter && window.puter.auth.isSignedIn()) {
+        const puterUser = await window.puter.auth.getUser();
+        setUser(puterUser);
+        
+        try {
+          const expiryStr = await window.puter.kv.get(`pro_expiry_${puterUser.username}`);
+          if (expiryStr) {
+            const expiryDate = new Date(expiryStr);
+            if (expiryDate > new Date()) {
+              setIsPro(true);
+              setProExpiry(expiryDate);
+            } else {
+              setIsPro(false);
+              setProExpiry(null);
+            }
+          }
+        } catch (e) {
+          console.error("Error checking pro status", e);
+        }
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleSignIn = async () => {
+    try {
+      const puterUser = await window.puter.auth.signIn();
+      setUser(puterUser);
+      window.location.reload(); // Reload to fetch KV data
+    } catch (error) {
+      console.error('Puter Sign In Error:', error);
+    }
+  };
+
+  const handleSignOut = () => {
+    window.puter.auth.signOut();
+    setUser(null);
+    setIsPro(false);
+    setProExpiry(null);
+  };
 
   const [viewMode, setViewMode] = useState<ViewMode>('calculator');
 
@@ -106,7 +155,14 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300">
-      <Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+      <Header 
+        isDarkMode={isDarkMode} 
+        toggleDarkMode={toggleDarkMode} 
+        user={user}
+        onSignIn={handleSignIn}
+        onSignOut={handleSignOut}
+        onOpenAdmin={() => setAdminModalOpen(true)}
+      />
 
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         {/* Navigation Switch */}
@@ -129,12 +185,14 @@ const App: React.FC = () => {
           </div>
         </div>
 
+        {!isPro && viewMode === 'calculator' && (
+          <div className="w-full h-24 bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg mb-12 flex items-center justify-center text-slate-400 font-medium overflow-hidden">
+            <span className="flex items-center gap-2"><Info size={18} /> AD REVENUE SPACE</span>
+          </div>
+        )}
+
         {viewMode === 'calculator' ? (
           <>
-            <div className="w-full h-24 bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg mb-12 flex items-center justify-center text-slate-400 font-medium overflow-hidden">
-              <span className="flex items-center gap-2"><Info size={18} /> AD REVENUE SPACE</span>
-            </div>
-
             <div className="flex flex-col lg:flex-row gap-8 items-start mb-12">
               <div id="calculator" className="w-full lg:w-7/12 scroll-mt-24">
                 <div className="card-base p-6 md:p-8 rounded-2xl shadow-sm">
@@ -200,12 +258,14 @@ const App: React.FC = () => {
             <AffiliateTools />
           </>
         ) : (
-          <ThumbnailStudio />
+          <ThumbnailStudio user={user} isPro={isPro} proExpiry={proExpiry} onSignIn={handleSignIn} />
         )}
 
-        <div className="w-full h-32 bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg mt-16 flex items-center justify-center text-slate-400 font-medium overflow-hidden">
-          <span className="flex items-center gap-2"><Info size={18} /> AD REVENUE SPACE</span>
-        </div>
+        {!isPro && (
+          <div className="w-full h-32 bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg mt-16 flex items-center justify-center text-slate-400 font-medium overflow-hidden">
+            <span className="flex items-center gap-2"><Info size={18} /> AD REVENUE SPACE</span>
+          </div>
+        )}
       </main>
 
       <Newsletter />
@@ -222,6 +282,11 @@ const App: React.FC = () => {
           type={modalState.type} 
         />
       )}
+
+      <AdminModal 
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
+      />
     </div>
   );
 };

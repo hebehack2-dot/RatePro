@@ -1,38 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
-import { Briefcase, Sun, Moon, LogIn, LogOut, User } from 'lucide-react';
+import React from 'react';
+import { Briefcase, Sun, Moon, LogIn, LogOut, User, ShieldAlert } from 'lucide-react';
 
 interface HeaderProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  user: any;
+  onSignIn: () => void;
+  onSignOut: () => void;
+  onOpenAdmin: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) => {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const checkUser = async () => {
-      if (window.puter.auth.isSignedIn()) {
-        const puterUser = await window.puter.auth.getUser();
-        setUser(puterUser);
-      }
-    };
-    checkUser();
-  }, []);
-
-  const handleSignIn = async () => {
-    try {
-      const puterUser = await window.puter.auth.signIn();
-      setUser(puterUser);
-    } catch (error) {
-      console.error('Puter Sign In Error:', error);
-    }
-  };
-
-  const handleSignOut = () => {
-    window.puter.auth.signOut();
-    setUser(null);
-  };
+export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode, user, onSignIn, onSignOut, onOpenAdmin }) => {
 
   const scrollToCalculator = () => {
     const element = document.getElementById('calculator');
@@ -62,6 +41,14 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) =>
           
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2" />
 
+          <button
+            onClick={onOpenAdmin}
+            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all opacity-0 hover:opacity-100 focus:opacity-100"
+            aria-label="Admin Panel"
+          >
+            <ShieldAlert size={20} />
+          </button>
+
           <button 
             onClick={toggleDarkMode}
             className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
@@ -79,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) =>
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{user.username}</span>
               </div>
               <button 
-                onClick={handleSignOut}
+                onClick={onSignOut}
                 className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors"
               >
                 <LogOut size={18} />
@@ -88,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) =>
             </div>
           ) : (
             <button 
-              onClick={handleSignIn}
+              onClick={onSignIn}
               className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl hover:bg-blue-600 hover:text-white transition-all font-bold border border-slate-200 dark:border-slate-700"
             >
               <LogIn size={18} />
