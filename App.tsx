@@ -14,6 +14,9 @@ import { CurrencyConverter } from './components/CurrencyConverter';
 import { AINegotiationCoach } from './components/AINegotiationCoach';
 import { ThumbnailStudio } from './components/ThumbnailStudio';
 import { AdminModal } from './components/AdminModal';
+import { AboutUs } from './components/AboutUs';
+import { ContactUs } from './components/ContactUs';
+import { ProFreelancerGuides } from './components/ProFreelancerGuides';
 import { CalculatorInputs, CalculationResults, CurrencyCode, ViewMode } from './types';
 import { Calculator as CalcIcon, Info, Sparkles, Globe, Image as ImageIcon, Clock } from 'lucide-react';
 
@@ -251,11 +254,17 @@ const App: React.FC = () => {
             
             <PricingStrategy />
 
+            <ProFreelancerGuides />
+
             <div className="mt-8">
               <SEOSection />
             </div>
 
             <AffiliateTools />
+            
+            <AboutUs />
+            
+            <ContactUs />
           </>
         ) : (
           <ThumbnailStudio user={user} isPro={isPro} proExpiry={proExpiry} onSignIn={handleSignIn} />

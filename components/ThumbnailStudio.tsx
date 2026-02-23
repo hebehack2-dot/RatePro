@@ -102,7 +102,18 @@ export const ThumbnailStudio: React.FC<ThumbnailStudioProps> = ({ user, isPro, p
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 items-start animate-in fade-in duration-500">
+    <div className="relative flex flex-col lg:flex-row gap-8 items-start animate-in fade-in duration-500">
+      {/* Coming Soon Overlay */}
+      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-sm rounded-3xl border border-slate-700">
+        <div className="bg-slate-800 p-4 rounded-full mb-6 shadow-2xl shadow-indigo-500/20">
+          <Sparkles className="text-indigo-400" size={48} />
+        </div>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tight text-center">Coming Soon</h2>
+        <p className="text-lg text-slate-300 max-w-md text-center font-medium leading-relaxed px-4">
+          AI Thumbnail Studio is under development. Get ready for 1-click viral thumbnails!
+        </p>
+      </div>
+
       {/* Sidebar Inputs */}
       <div className="w-full lg:w-4/12 space-y-6">
         <div className="card-base p-6 rounded-3xl shadow-sm">
